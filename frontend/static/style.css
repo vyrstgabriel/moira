@@ -1,0 +1,27 @@
+/* style.css — classical/ancient UI */
+/* TODO: parchment palette, Cinzel font, Greek key borders */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=IM+Fell+English:ital@0;1&display=swap');
+
+:root {
+  --parchment: #F2E8C9;
+  --ink:        #2C1A0E;
+  --gold:       #B8972B;
+  --terracotta: #8B3A2A;
+}
+
+body {
+  background: var(--parchment);
+  color: var(--ink);
+  font-family: 'IM Fell English', serif;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1 {
+  font-family: 'Cinzel', serif;
+  letter-spacing: 0.3em;
+  color: var(--terracotta);
+  text-align: center;
+}
