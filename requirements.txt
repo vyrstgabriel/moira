@@ -5,3 +5,6 @@ pyswisseph
 python-dotenv
 jinja2
 python-multipart
+geopy
+timezonefinder
+pytz

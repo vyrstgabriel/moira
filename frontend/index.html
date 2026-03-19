@@ -2,16 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moira — Natal Oracle</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <h1>MOIRA</h1>
-  <p class="subtitle">Cast your nativity</p>
 
-  <form action="/reading" method="POST">
-    <!-- TODO: birth date, time, place fields -->
-    <button type="submit">Seek the Stars</button>
-  </form>
+  <header>
+    <h1>MOIRA</h1>
+    <p class="subtitle">Cast your nativity</p>
+  </header>
+
+  <main>
+    <form action="/reading" method="POST">
+
+      <div class="field">
+        <label for="name">Your name</label>
+        <input type="text" id="name" name="name" placeholder="e.g. Marcus" />
+      </div>
+
+      <div class="field">
+        <label for="date">Date of birth</label>
+        <input type="date" id="date" name="date" required />
+      </div>
+
+      <div class="field">
+        <label for="time">Time of birth</label>
+        <input type="time" id="time" name="time" required />
+        <small>Use local time at your place of birth. Precision matters.</small>
+      </div>
+
+      <div class="field">
+        <label for="place">Place of birth</label>
+        <input type="text" id="place" name="place" placeholder="e.g. Rome, Italy" required />
+      </div>
+
+      <button type="submit">Seek the Stars</button>
+
+    </form>
+  </main>
+
 </body>
 </html>

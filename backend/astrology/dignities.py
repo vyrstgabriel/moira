@@ -25,7 +25,6 @@ EXALTATION = {
     "Cancer":      "Jupiter",
     "Virgo":       "Mercury",
     "Libra":       "Saturn",
-    "Scorpio":     "Moon",   # fall of Moon is actually Scorpio — exalt is Taurus. TODO: verify
     "Capricorn":   "Mars",
     "Pisces":      "Venus",
 }
