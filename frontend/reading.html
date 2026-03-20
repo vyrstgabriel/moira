@@ -6,10 +6,19 @@
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <h1>MOIRA</h1>
-  <div class="reading">
-    <!-- TODO: render reading text from Claude -->
-    {{ reading }}
-  </div>
+  <header>
+    <h1>MOIRA</h1>
+  </header>
+  <main class="reading-layout">
+    <div class="chart-container">
+      {{ chart_svg | safe }}
+    </div>
+    <div class="reading">
+      {{ reading | safe }}
+    </div>
+  </main>
+  <footer>
+    <a href="/">← Cast another nativity</a>
+  </footer>
 </body>
 </html>

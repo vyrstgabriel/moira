@@ -36,7 +36,7 @@ def sign_distance(sign_a: str, sign_b: str) -> int:
     return ((b - a) % 12) + 1
 
 
-def aspect_between(sign_a: str, sign_b: str) -> str | None:
+def aspect_between(sign_a: str, sign_b: str):
     """
     Returns the aspect type between two signs, or None if they don't aspect.
     Conjunction = same sign (distance 1).

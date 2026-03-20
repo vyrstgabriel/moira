@@ -2,6 +2,7 @@
 # Calculates planetary positions, Ascendant, and house cusps using Swiss Ephemeris.
 # All positions are tropical (geocentric), as per Ptolemy's Tetrabiblos.
 
+from __future__ import annotations
 import swisseph as swe
 from dataclasses import dataclass
 from datetime import datetime

@@ -8,13 +8,21 @@
 </head>
 <body>
 
+  <div id="loading-veil" hidden>
+    <div class="veil-inner">
+      <p class="veil-title">MOIRA</p>
+      <p id="veil-message" class="veil-message">Consulting the ephemeris…</p>
+      <div class="veil-ornament">⁂</div>
+    </div>
+  </div>
+
   <header>
     <h1>MOIRA</h1>
     <p class="subtitle">Cast your nativity</p>
   </header>
 
   <main>
-    <form action="/reading" method="POST">
+    <form id="natal-form" action="/reading" method="POST">
 
       <div class="field">
         <label for="name">Your name</label>
@@ -29,7 +37,7 @@
       <div class="field">
         <label for="time">Time of birth</label>
         <input type="time" id="time" name="time" required />
-        <small>Use local time at your place of birth. Precision matters.</small>
+        <small>24-hour local time at your place of birth. Precision matters.</small>
       </div>
 
       <div class="field">
@@ -41,6 +49,29 @@
 
     </form>
   </main>
+
+  <script>
+    const messages = [
+      "Consulting the ephemeris\u2026",
+      "Tracing the ecliptic\u2026",
+      "Calculating dignities\u2026",
+      "Observing the Lots\u2026",
+      "The heavens are being read\u2026",
+      "Awaiting the oracle\u2026",
+    ];
+    let msgIndex = 0;
+
+    document.getElementById("natal-form").addEventListener("submit", function () {
+      const veil = document.getElementById("loading-veil");
+      const msgEl = document.getElementById("veil-message");
+      veil.hidden = false;
+
+      setInterval(function () {
+        msgIndex = (msgIndex + 1) % messages.length;
+        msgEl.textContent = messages[msgIndex];
+      }, 2200);
+    });
+  </script>
 
 </body>
 </html>

@@ -4,6 +4,9 @@
 # Formula: Lot = Ascendant + Planet A - Planet B
 # Day/night charts reverse the Fortune formula; others vary by source.
 
+from __future__ import annotations
+
+
 def calculate_lot(asc: float, planet_a: float, planet_b: float) -> float:
     """Generic lot calculation, result normalized to 0–360."""
     return (asc + planet_a - planet_b) % 360
