@@ -166,8 +166,10 @@ def generate_chart_svg(chart, chart_data: dict) -> str:
     .line    { fill: none; stroke: #2c1a0e; stroke-width: 1.1; }
     .diag    { fill: none; stroke: #2c1a0e; stroke-width: 0.9; opacity: 0.7; }
     .house-n { font: 700 9px Palatino, Georgia, serif; fill: #7a5c3a; }
-    .sign-g  { font: 17px Palatino, Georgia, serif; fill: #2c1a0e; }
-    .planet  { font: 15px Palatino, Georgia, serif; fill: #5a1a0a; }
+    .sign-g  { font: 22px "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols", Georgia, serif;
+               fill: #2c1a0e; }
+    .planet  { font: 19px "Apple Symbols", "Segoe UI Symbol", "Noto Sans Symbols", Georgia, serif;
+               fill: #7a1a0a; }
     .asc-tag { font: italic bold 8px Palatino, Georgia, serif;
                fill: #7a5c3a; letter-spacing: 0.5px; }
   </style>

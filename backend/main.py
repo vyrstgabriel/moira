@@ -4,6 +4,7 @@
 from dotenv import load_dotenv
 load_dotenv()
 
+import swisseph as swe
 from fastapi import FastAPI, Request, Form
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -12,11 +13,12 @@ from timezonefinder import TimezoneFinder
 from datetime import datetime
 import pytz
 
-from astrology.chart import calculate_chart, degree_to_sign
+from astrology.chart import calculate_chart, degree_to_sign, prenatal_syzygy
 from astrology.dignities import dignities_of
 from astrology.lots import lots
 from astrology.aspects import all_aspects
 from astrology.chart_svg import generate_chart_svg
+from astrology.oikodespotes import calculate_oikodespotes
 from reader import get_reading
 
 app = FastAPI()
@@ -37,6 +39,7 @@ async def index(request: Request):
 async def reading(
     request: Request,
     name: str = Form(default=""),
+    gender: str = Form(default="unspecified"),
     date: str = Form(...),
     time: str = Form(...),
     place: str = Form(...),
@@ -82,9 +85,14 @@ async def reading(
 
     planet_aspects = all_aspects(chart.planets)
 
+    jd = swe.julday(utc_dt.year, utc_dt.month, utc_dt.day, ut_hour)
+    syzygy = prenatal_syzygy(jd)
+    oikodespotes = calculate_oikodespotes(chart, greek_lots, syzygy)
+
     # Assemble chart data for the reader
     chart_data = {
         "name": name or "the native",
+        "gender": gender,
         "place": place,
         "ascendant": {
             "sign": chart.ascendant_sign,
@@ -107,6 +115,8 @@ async def reading(
         },
         "lots": lot_details,
         "aspects": planet_aspects,
+        "prenatal_syzygy": syzygy,
+        "oikodespotes": oikodespotes,
     }
 
     reading_text = get_reading(chart_data)

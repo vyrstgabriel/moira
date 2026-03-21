@@ -12,6 +12,10 @@
     <div class="veil-inner">
       <p class="veil-title">MOIRA</p>
       <p id="veil-message" class="veil-message">Consulting the ephemeris…</p>
+      <div class="progress-track">
+        <div id="progress-bar" class="progress-bar"></div>
+      </div>
+      <p class="veil-note">Readings typically take 2–4 minutes.</p>
       <div class="veil-ornament">⁂</div>
     </div>
   </div>
@@ -30,14 +34,32 @@
       </div>
 
       <div class="field">
+        <label>Gender</label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="gender" value="unspecified" checked />
+            <span>Unspecified</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="gender" value="male" />
+            <span>Male</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="gender" value="female" />
+            <span>Female</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field">
         <label for="date">Date of birth</label>
         <input type="date" id="date" name="date" required />
       </div>
 
       <div class="field">
         <label for="time">Time of birth</label>
-        <input type="time" id="time" name="time" required />
-        <small>24-hour local time at your place of birth. Precision matters.</small>
+        <input type="text" id="time" name="time" placeholder="HH:MM" pattern="[0-2][0-9]:[0-5][0-9]" required />
+        <small>24-hour format (e.g. 14:35). Local time at your place of birth. Precision matters.</small>
       </div>
 
       <div class="field">
@@ -61,15 +83,55 @@
     ];
     let msgIndex = 0;
 
-    document.getElementById("natal-form").addEventListener("submit", function () {
-      const veil = document.getElementById("loading-veil");
-      const msgEl = document.getElementById("veil-message");
-      veil.hidden = false;
+    document.getElementById("time").addEventListener("input", function (e) {
+      let v = e.target.value.replace(/[^0-9]/g, "");
+      if (v.length >= 3) v = v.slice(0, 2) + ":" + v.slice(2, 4);
+      e.target.value = v;
+    });
 
+    document.getElementById("natal-form").addEventListener("submit", function () {
+      const veil   = document.getElementById("loading-veil");
+      const msgEl  = document.getElementById("veil-message");
+      const bar    = document.getElementById("progress-bar");
+      veil.hidden  = false;
+
+      // Cycle messages
       setInterval(function () {
         msgIndex = (msgIndex + 1) % messages.length;
         msgEl.textContent = messages[msgIndex];
       }, 2200);
+
+      // Staged progress — calibrated to ~3 min total
+      // Each stage: [target %, duration ms]
+      const stages = [
+        [12,  4000],    // geocoding + chart calculations
+        [28,  10000],   // aspects, lots, dignities
+        [88,  160000],  // Claude API call (the long part)
+      ];
+
+      let stageIndex = 0;
+      let pulsing = false;
+
+      function advance() {
+        if (stageIndex >= stages.length) {
+          // Stall near 90%, slowly oscillate until page loads
+          if (!pulsing) {
+            pulsing = true;
+            setInterval(function () {
+              const w = parseFloat(bar.style.width) || 88;
+              bar.style.transition = "width 3s ease-in-out";
+              bar.style.width = (w > 90 ? 88 : 92) + "%";
+            }, 3500);
+          }
+          return;
+        }
+        const [pct, dur] = stages[stageIndex++];
+        bar.style.transition = "width " + dur + "ms linear";
+        bar.style.width = pct + "%";
+        setTimeout(advance, dur);
+      }
+
+      advance();
     });
   </script>
 

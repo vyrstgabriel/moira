@@ -28,19 +28,19 @@ SIGNS = [
 
 def sign_distance(sign_a: str, sign_b: str) -> int:
     """
-    Returns the forward distance in signs from sign_a to sign_b (1–12).
-    Used to determine aspect type.
+    Returns the shorter arc distance between two signs (1–7), symmetric.
+    Conjunction = 1 (same sign). Opposition = 7 (6 signs apart).
     """
     a = SIGNS.index(sign_a)
     b = SIGNS.index(sign_b)
-    return ((b - a) % 12) + 1
+    forward = ((b - a) % 12) + 1
+    backward = ((a - b) % 12) + 1
+    return min(forward, backward)
 
 
 def aspect_between(sign_a: str, sign_b: str):
     """
-    Returns the aspect type between two signs, or None if they don't aspect.
-    Conjunction = same sign (distance 1).
-    Aversion (no aspect) = distance 2, 6, 8, 11, 12.
+    Returns the aspect type between two signs, or None if averse.
     """
     dist = sign_distance(sign_a, sign_b)
     if dist == 1:

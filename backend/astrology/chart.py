@@ -70,6 +70,42 @@ def whole_sign_houses(asc_sign: str) -> list[str]:
     return [SIGNS[(start + i) % 12] for i in range(12)]
 
 
+def prenatal_syzygy(jd_birth: float) -> dict:
+    """
+    Find the last New or Full Moon before birth.
+    Returns sign, degree, and type ("new moon" or "full moon").
+    Walking backward in 2-hour steps; elongation = (Moon - Sun) % 360.
+    """
+    step = 2 / 24  # 2 hours in days
+
+    def elongation(jd):
+        sun, _ = swe.calc_ut(jd, swe.SUN)
+        moon, _ = swe.calc_ut(jd, swe.MOON)
+        return (moon[0] - sun[0]) % 360
+
+    prev = elongation(jd_birth)
+
+    for i in range(1, 362):          # up to ~30 days back
+        jd = jd_birth - i * step
+        curr = elongation(jd)
+
+        # New moon: elongation wraps from near-0 back to near-360
+        if prev < 15 and curr > 345:
+            moon_res, _ = swe.calc_ut(jd + step * 0.5, swe.MOON)
+            sign, deg = degree_to_sign(moon_res[0])
+            return {"type": "new moon", "sign": sign, "degree": round(deg, 2)}
+
+        # Full moon: elongation crosses 180 from above to below (going backward)
+        if prev > 175 and curr < 185 and curr < prev:
+            moon_res, _ = swe.calc_ut(jd + step * 0.5, swe.MOON)
+            sign, deg = degree_to_sign(moon_res[0])
+            return {"type": "full moon", "sign": sign, "degree": round(deg, 2)}
+
+        prev = curr
+
+    return {"type": "unknown", "sign": "unknown", "degree": 0.0}
+
+
 def calculate_chart(
     year: int, month: int, day: int,
     hour: float,           # decimal UT hour (e.g. 14.5 = 14:30)

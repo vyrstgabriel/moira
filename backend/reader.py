@@ -22,6 +22,7 @@ def format_chart(data: dict) -> str:
     lines = []
 
     lines.append(f"Native: {data['name']}")
+    lines.append(f"Gender: {data.get('gender', 'unspecified')}")
     lines.append(f"Place of birth: {data['place']}")
     lines.append(f"Chart type: {data['sect'].capitalize()} chart")
     lines.append("")
@@ -34,7 +35,7 @@ def format_chart(data: dict) -> str:
     lines.append("PLANETS")
     for pname, p in data["planets"].items():
         greek = GREEK_NAMES.get(pname, pname)
-        retro = "  (retrograde)" if p["retrograde"] else ""
+        retro = "  *** RETROGRADE ***" if p["retrograde"] else ""
         dignities = ", ".join(p["dignities"]) if p["dignities"] else "peregrine"
         lines.append(
             f"  {greek:<12} {p['sign']:<14} house {p['house']:<3} {p['degree']}°"
@@ -52,11 +53,39 @@ def format_chart(data: dict) -> str:
         lines.append("  None")
     lines.append("")
 
+    syzygy = data.get("prenatal_syzygy", {})
+    if syzygy and syzygy.get("type") != "unknown":
+        lines.append("PRENATAL SYZYGY")
+        lines.append(
+            f"  {syzygy['type'].capitalize()}  —  {syzygy['sign']} {syzygy['degree']}°"
+        )
+        lines.append("")
+
     lines.append("LOTS")
     for lot_name, lot in data["lots"].items():
         lines.append(
             f"  {lot_name:<12} {lot['sign']:<14} house {lot['house']}  {lot['degree']}°"
         )
+    lines.append("")
+
+    oiko = data.get("oikodespotes", {})
+    if oiko:
+        patron = oiko["patron"]
+        lines.append("OIKODESPOTES (pre-calculated — use this, do not re-derive)")
+        lines.append(f"  Patron deity: {GREEK_NAMES.get(patron, patron)} ({patron})")
+        lines.append("  Dignity tally across the five Ptolemaic aphetic points:")
+        scores = oiko["scores"]
+        detail = oiko["detail"]
+        for planet in sorted(scores, key=lambda p: -scores[p]):
+            if scores[planet] == 0:
+                continue
+            greek = GREEK_NAMES.get(planet, planet)
+            point_notes = []
+            for point_name, dignities in detail[planet].items():
+                point_notes.append(f"{point_name}: {', '.join(dignities)}")
+            lines.append(
+                f"    {greek:<12} {scores[planet]:>3} pts  —  {';  '.join(point_notes)}"
+            )
 
     return "\n".join(lines)
 
