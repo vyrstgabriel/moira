@@ -70,22 +70,22 @@ def format_chart(data: dict) -> str:
 
     oiko = data.get("oikodespotes", {})
     if oiko:
-        patron = oiko["patron"]
+        master = oiko["master"]
+        flags  = oiko.get("flags", {})
         lines.append("OIKODESPOTES (pre-calculated — use this, do not re-derive)")
-        lines.append(f"  Patron deity: {GREEK_NAMES.get(patron, patron)} ({patron})")
-        lines.append("  Dignity tally across the five Ptolemaic aphetic points:")
-        scores = oiko["scores"]
-        detail = oiko["detail"]
-        for planet in sorted(scores, key=lambda p: -scores[p]):
-            if scores[planet] == 0:
-                continue
-            greek = GREEK_NAMES.get(planet, planet)
-            point_notes = []
-            for point_name, dignities in detail[planet].items():
-                point_notes.append(f"{point_name}: {', '.join(dignities)}")
-            lines.append(
-                f"    {greek:<12} {scores[planet]:>3} pts  —  {';  '.join(point_notes)}"
-            )
+        lines.append(f"  Master of the nativity: {GREEK_NAMES.get(master, master)} ({master})")
+        lines.append(f"  Predominator: {oiko['predominator']}  ({oiko['predominator_sign']})")
+        lines.append(f"  Decided by: {oiko['decision_reason']}")
+        lines.append(
+            f"  Sun: house {oiko['sun_house']} ({oiko['sun_angularity']})  |  "
+            f"Moon: house {oiko['moon_house']} ({oiko['moon_angularity']})"
+        )
+        if flags.get("twilight_birth"):
+            lines.append("  *** TWILIGHT BIRTH — sect is uncertain ***")
+        if flags.get("easterness_decided"):
+            lines.append("  *** Result depends on the easterness criterion, which is textually ambiguous in the sources ***")
+        if flags.get("ambiguous"):
+            lines.append("  *** Full tie — result is ambiguous, defaulted to sect light ***")
 
     return "\n".join(lines)
 

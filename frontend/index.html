@@ -93,7 +93,8 @@
       const veil   = document.getElementById("loading-veil");
       const msgEl  = document.getElementById("veil-message");
       const bar    = document.getElementById("progress-bar");
-      veil.hidden  = false;
+      veil.hidden = false;
+      bar.style.width = "0%";
 
       // Cycle messages
       setInterval(function () {
@@ -131,7 +132,10 @@
         setTimeout(advance, dur);
       }
 
-      advance();
+      // Two rAFs ensure the browser has painted the 0% state before animating
+      requestAnimationFrame(function () {
+        requestAnimationFrame(advance);
+      });
     });
   </script>
 

@@ -194,6 +194,7 @@ button[type="submit"]:hover {
   height: 100%;
   width: 0%;
   background: var(--gold);
+  transition: width 4s linear;
 }
 
 .veil-note {
