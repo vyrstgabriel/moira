@@ -4,7 +4,6 @@
 # This creates 12 sections: 8 outer triangles + 4 inner diamond triangles.
 
 from __future__ import annotations
-from astrology.chart import SIGNS
 
 PLANET_GLYPHS = {
     "Sun":     "☉",
@@ -69,63 +68,21 @@ def generate_chart_svg(chart, chart_data: dict) -> str:
     p_br = (OX + 3*S/4,   OY + 3*S/4)
     p_bl = (OX + S/4,     OY + 3*S/4)
 
-    # ── 12 house sections ──────────────────────────────────────────────
-    # Outer 8 triangles (2 per corner), then 4 inner diamond sections.
-    # Traditional layout with ASC at bottom-left corner, houses counterclockwise.
-    #
-    #   [ 9 ][ 10][ 11]
-    #   [ 8 ][    ][ 12]
-    #   [ 7 ][ 6 ][ 5 ]   ← outer ring  (but rotated: ASC=left here)
-    #
-    # Standard Hellenistic square (ASC = left side, MC = top):
-    # House 1  = left outer triangle (upper)      L corner, above diagonal
-    # House 2  = left outer triangle (lower)      L corner, below diagonal
-    # House 3  = inner left diamond section       cadent
-    # House 4  = bottom outer triangle (left)     BL corner upper
-    # House 5  = bottom outer triangle (right)    BL corner lower  (or B corner)
-    # House 6  = inner bottom diamond section
-    # House 7  = right outer triangle (lower)     R corner
-    # House 8  = right outer triangle (upper)
-    # House 9  = inner right diamond section
-    # House 10 = top outer triangle (right)       MC
-    # House 11 = top outer triangle (left)
-    # House 12 = inner top diamond section
-    #
-    # Simpler and more consistent with the image — ASC at bottom-left:
-    # Going counterclockwise from bottom-left:
-
+    # Outer 8 triangles plus 4 inner diamond sections, with ASC at bottom-left.
     house_polygons = {
-        1:  [BL, L,  p_bl],          # bottom-left, left side
-        2:  [BL, B,  p_bl],          # bottom-left, bottom side
-        3:  [B,  BR, p_br],          # bottom-right, bottom side
-        4:  [BR, R,  p_br],          # bottom-right, right side
-        5:  [R,  TR, p_tr],          # top-right, right side
-        6:  [TR, T,  p_tr],          # top-right, top side
-        7:  [T,  TL, p_tl],          # top-left, top side
-        8:  [TL, L,  p_tl],          # top-left, left side
-        # inner diamond sections (cadent houses)
-        9:  [p_tl, T,  C],           # inner top-left
-        10: [T,  p_tr, C],           # inner top-right  (MC region)
-        11: [p_tr, R,  C],           # inner right
-        12: [R,  p_br, C],           # inner bottom-right
-        # note: this leaves BL area split as houses 1&2, which is correct
+        1:  [BL, L,   p_bl],
+        2:  [B,  BL,  p_bl],
+        3:  [B,  BR,  p_br],
+        4:  [BR, B,   p_br],
+        5:  [R,  BR,  p_br],
+        6:  [p_br, B, C],
+        7:  [TR, R,   p_tr],
+        8:  [T,  TR,  p_tr],
+        9:  [p_tl, T, C],
+        10: [TL, T,   p_tl],
+        11: [L,  TL,  p_tl],
+        12: [p_bl, L, C],
     }
-
-    # Reassign inner sections more evenly — 4 inner triangles for 3,6,9,12
-    house_polygons[3]  = [B,  BR, p_br]
-    house_polygons[6]  = [p_br, B,  C]
-    house_polygons[9]  = [p_tl, T,  C]
-    house_polygons[12] = [p_bl, L,  C]
-
-    # Redo outer ring cleanly: 8 triangles for houses 1,2,4,5,7,8,10,11
-    house_polygons[1]  = [BL, L,   p_bl]
-    house_polygons[2]  = [B,  BL,  p_bl]
-    house_polygons[4]  = [BR, B,   p_br]
-    house_polygons[5]  = [R,  BR,  p_br]
-    house_polygons[7]  = [TR, R,   p_tr]
-    house_polygons[8]  = [T,  TR,  p_tr]
-    house_polygons[10] = [TL, T,   p_tl]
-    house_polygons[11] = [L,  TL,  p_tl]
 
     # Build planet-per-house index
     planet_houses: dict[int, list[str]] = {h: [] for h in range(1, 13)}

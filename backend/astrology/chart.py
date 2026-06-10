@@ -5,7 +5,6 @@
 from __future__ import annotations
 import swisseph as swe
 from dataclasses import dataclass
-from datetime import datetime
 
 PLANETS = {
     "Sun":     swe.SUN,

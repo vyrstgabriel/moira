@@ -10,6 +10,12 @@
 
   <div id="loading-veil" hidden>
     <div class="veil-inner">
+      <div class="orrery" aria-hidden="true">
+        <span class="orbit orbit-one"></span>
+        <span class="orbit orbit-two"></span>
+        <span class="star star-one"></span>
+        <span class="star star-two"></span>
+      </div>
       <p class="veil-title">MOIRA</p>
       <p id="veil-message" class="veil-message">Consulting the ephemeris…</p>
       <div class="progress-track">
@@ -25,7 +31,7 @@
     <p class="subtitle">Cast your nativity</p>
   </header>
 
-  <main>
+  <main class="form-shell">
     <form id="natal-form" action="/reading" method="POST">
 
       <div class="field">

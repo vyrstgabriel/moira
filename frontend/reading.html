@@ -2,20 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Moira — Your Reading</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header>
     <h1>MOIRA</h1>
+    <p class="subtitle">The nativity unfolded</p>
   </header>
   <main class="reading-layout">
-    <div class="chart-container">
+    <aside class="chart-container" aria-label="Natal chart">
       {{ chart_svg | safe }}
-    </div>
-    <div class="reading">
+    </aside>
+    <article class="reading">
       {{ reading | safe }}
-    </div>
+    </article>
   </main>
   <footer>
     <a href="/">← Cast another nativity</a>

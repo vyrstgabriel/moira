@@ -98,7 +98,7 @@ def get_reading(chart_data: dict) -> str:
 
     response = client.messages.create(
         model="claude-sonnet-4-6",
-        max_tokens=8192,
+        max_tokens=3200,
         temperature=1,  # slight variation keeps readings natural; use 0 for exact determinism
         system=SYSTEM_PROMPT,
         messages=[{"role": "user", "content": user_message}],

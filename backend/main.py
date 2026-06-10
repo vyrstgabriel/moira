@@ -11,6 +11,8 @@ from fastapi.templating import Jinja2Templates
 from geopy.geocoders import Nominatim
 from timezonefinder import TimezoneFinder
 from datetime import datetime
+from html import escape
+from pathlib import Path
 import pytz
 
 from astrology.chart import calculate_chart, degree_to_sign, prenatal_syzygy
@@ -23,16 +25,45 @@ from reader import get_reading
 
 app = FastAPI()
 
-app.mount("/static", StaticFiles(directory="../frontend/static"), name="static")
-templates = Jinja2Templates(directory="../frontend")
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIR = BASE_DIR / "frontend"
+
+app.mount("/static", StaticFiles(directory=FRONTEND_DIR / "static"), name="static")
+templates = Jinja2Templates(directory=FRONTEND_DIR)
 
 geolocator = Nominatim(user_agent="moira")
 tf = TimezoneFinder()
 
 
+def reading_to_html(text: str) -> str:
+    """Render the model's lightweight Markdown-ish output as escaped HTML."""
+    blocks = []
+    for raw in text.split("\n\n"):
+        block = raw.strip()
+        if not block:
+            continue
+
+        if set(block) <= {"-"} and len(block) >= 3:
+            blocks.append("<hr>")
+            continue
+
+        if block.startswith("## "):
+            blocks.append(f"<h3>{escape(block[3:].strip())}</h3>")
+            continue
+
+        if block.startswith("# "):
+            blocks.append(f"<h2>{escape(block[2:].strip())}</h2>")
+            continue
+
+        paragraph = "<br>".join(escape(line.strip()) for line in block.splitlines())
+        blocks.append(f"<p>{paragraph}</p>")
+
+    return "".join(blocks)
+
+
 @app.get("/")
 async def index(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request, "index.html")
 
 
 @app.post("/reading")
@@ -122,15 +153,9 @@ async def reading(
     reading_text = get_reading(chart_data)
     chart_svg = generate_chart_svg(chart, chart_data)
 
-    # Convert double-newlines to HTML paragraphs
-    reading_html = "".join(
-        f"<p>{para.strip()}</p>"
-        for para in reading_text.split("\n\n")
-        if para.strip()
-    )
+    reading_html = reading_to_html(reading_text)
 
-    return templates.TemplateResponse("reading.html", {
-        "request": request,
+    return templates.TemplateResponse(request, "reading.html", {
         "reading": reading_html,
         "chart_svg": chart_svg,
     })
