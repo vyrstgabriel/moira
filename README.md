@@ -6,6 +6,8 @@ Enter a birth date, time, and place. Moira calculates a full natal chart using t
 
 ![Reading example](screenshot.png)
 
+The built-in Augustus demo is pre-generated: opening it never calls Claude, geocodes a place, or consumes API credits. Visitors can also calculate their own chart and placements without AI. When a sponsored-reading key is configured, each browser can request up to five new Claude Sonnet readings per calendar month while the workspace budget lasts.
+
 ---
 
 ## Features
@@ -45,6 +47,38 @@ python3 -m uvicorn main:app --reload
 ```
 
 Then open `http://localhost:8000`.
+
+To deploy a public, zero-credit demo, omit `ANTHROPIC_API_KEY`. The `/demo` route remains fully functional from its checked-in reading fixture, and `/chart` calculates personal charts without AI.
+
+## Sponsored public readings
+
+To offer live Sonnet readings with a hard $1 monthly ceiling:
+
+1. In Claude Console, create a non-default workspace named `Moira Public`.
+2. Open that workspace's **Limits** tab and set its monthly spend limit to `$1`.
+3. Create an API key inside that workspace and use it as the deployed `ANTHROPIC_API_KEY`.
+
+```env
+ANTHROPIC_API_KEY=your_moira_public_workspace_key
+MOIRA_VISITOR_MONTHLY_LIMIT=5
+MOIRA_SECURE_COOKIES=true
+```
+
+The Anthropic workspace limit is the financial backstop. Moira's quota is a fairness layer stored in a tamper-resistant, HTTP-only browser cookie, so it does not need a database or persistent disk. A visitor can still reset their allowance by clearing browser data, but the Anthropic workspace cap prevents total spending beyond `$1`.
+
+## Free deployment on Render
+
+Moira includes a `render.yaml` Blueprint, so no persistent storage or server setup is required.
+
+1. Push the repository to GitHub.
+2. Create a free account at Render and connect GitHub.
+3. In the Render Dashboard, choose **New → Blueprint** and select the Moira repository.
+4. When Render asks for `ANTHROPIC_API_KEY`, paste the key from the capped `Moira Public` workspace.
+5. Click **Apply**. Render will build Moira and provide a public `onrender.com` URL.
+
+The free service sleeps after 15 minutes without traffic, so its first page load after a quiet period can take about a minute. The quota does not depend on Render's temporary filesystem.
+
+Personal charts use OpenStreetMap Nominatim for the visitor's one-time place lookup. Moira caches results and throttles lookups to comply with the public service's usage policy. Set `NOMINATIM_USER_AGENT` to identify your deployment and `NOMINATIM_DOMAIN` if you switch to another Nominatim provider or your own instance.
 
 ## Sources
 

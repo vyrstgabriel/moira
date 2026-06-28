@@ -21,7 +21,7 @@
       <div class="progress-track">
         <div id="progress-bar" class="progress-bar"></div>
       </div>
-      <p class="veil-note">Readings typically take 2–4 minutes.</p>
+      <p id="veil-note" class="veil-note">Calculating your nativity…</p>
       <div class="veil-ornament">⁂</div>
     </div>
   </div>
@@ -31,8 +31,16 @@
     <p class="subtitle">Cast your nativity</p>
   </header>
 
+  <section class="demo-showcase" aria-labelledby="demo-title">
+    <p class="eyebrow">A nativity from history</p>
+    <h2 id="demo-title">Augustus Caesar</h2>
+    <p>See a complete reading without making an AI request. This reading was generated once and preserved.</p>
+    <a class="demo-button" href="/demo">Press for demo</a>
+    <small>No API key, wait, or credits required.</small>
+  </section>
+
   <main class="form-shell">
-    <form id="natal-form" action="/reading" method="POST">
+    <form id="natal-form" action="/chart" method="POST">
 
       <div class="field">
         <label for="name">Your name</label>
@@ -71,9 +79,21 @@
       <div class="field">
         <label for="place">Place of birth</label>
         <input type="text" id="place" name="place" placeholder="e.g. Rome, Italy" required />
+        <small>Place lookup © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap contributors</a>.</small>
       </div>
 
-      <button type="submit">Seek the Stars</button>
+      <button type="submit" formaction="/chart">Cast my chart</button>
+      <small class="action-note">Free chart calculation. No AI request or API credits.</small>
+
+      {% if personal_readings_enabled %}
+      <button class="secondary-action" type="submit" formaction="/reading">Generate my Claude reading</button>
+      <small class="action-note">{{ visitor_monthly_limit }} sponsored Sonnet readings per visitor each month, while the monthly budget lasts.</small>
+      {% else %}
+      <aside class="demo-only-note">
+        <p>The public demo includes personal charts, but not newly generated interpretations.</p>
+        <small>Open Augustus above to see a complete example reading.</small>
+      </aside>
+      {% endif %}
 
     </form>
   </main>
@@ -95,12 +115,17 @@
       e.target.value = v;
     });
 
-    document.getElementById("natal-form").addEventListener("submit", function () {
+    document.getElementById("natal-form").addEventListener("submit", function (event) {
       const veil   = document.getElementById("loading-veil");
       const msgEl  = document.getElementById("veil-message");
       const bar    = document.getElementById("progress-bar");
+      const note   = document.getElementById("veil-note");
+      const isReading = event.submitter && event.submitter.formAction.endsWith("/reading");
       veil.hidden = false;
       bar.style.width = "0%";
+      note.textContent = isReading
+        ? "Readings typically take 2–4 minutes."
+        : "Calculating your chart — no AI request is being made.";
 
       // Cycle messages
       setInterval(function () {
@@ -110,11 +135,16 @@
 
       // Staged progress — calibrated to ~3 min total
       // Each stage: [target %, duration ms]
-      const stages = [
-        [12,  4000],    // geocoding + chart calculations
-        [28,  10000],   // aspects, lots, dignities
-        [88,  160000],  // Claude API call (the long part)
-      ];
+      const stages = isReading
+        ? [
+            [12,  4000],
+            [28,  10000],
+            [88,  160000],
+          ]
+        : [
+            [45, 800],
+            [88, 3000],
+          ];
 
       let stageIndex = 0;
       let pulsing = false;

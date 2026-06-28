@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: moira
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: MOIRA_VISITOR_MONTHLY_LIMIT
+        value: "5"
+      - key: MOIRA_SECURE_COOKIES
+        value: "true"
+      - key: MOIRA_COOKIE_SECRET
+        generateValue: true

@@ -110,6 +110,7 @@ def calculate_chart(
     hour: float,           # decimal UT hour (e.g. 14.5 = 14:30)
     latitude: float,
     longitude: float,
+    calendar: int = swe.GREG_CAL,
 ) -> Chart:
     """
     Calculate a Hellenistic natal chart.
@@ -118,7 +119,7 @@ def calculate_chart(
     swe.set_ephe_path(None)  # use bundled ephemeris
 
     # Julian Day Number (Universal Time)
-    jd = swe.julday(year, month, day, hour)
+    jd = swe.julday(year, month, day, hour, calendar)
 
     # House cusps & angles — 'W' = Whole Sign system
     cusps, ascmc = swe.houses(jd, latitude, longitude, b'W')

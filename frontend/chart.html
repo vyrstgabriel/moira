@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Moira — {{ chart.name }}'s Chart</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header>
+    <h1>MOIRA</h1>
+    <p class="subtitle">The heavens at {{ chart.name }}'s birth</p>
+  </header>
+
+  <aside class="chart-cost-note">
+    This chart was calculated from the ephemeris. No AI request or API credits were used.
+  </aside>
+
+  <main class="reading-layout chart-results">
+    <aside class="chart-container" aria-label="Natal chart">
+      {{ chart_svg | safe }}
+    </aside>
+
+    <article class="chart-summary">
+      {% if reading_notice %}
+      <aside class="reading-notice" role="status">{{ reading_notice }}</aside>
+      {% endif %}
+
+      <div class="chart-facts">
+        <div><span>Ascendant</span><strong>{{ chart.ascendant.sign }} {{ chart.ascendant.degree }}°</strong></div>
+        <div><span>Midheaven</span><strong>{{ chart.mc.sign }} {{ chart.mc.degree }}°</strong></div>
+        <div><span>Sect</span><strong>{{ chart.sect | capitalize }}</strong></div>
+        <div><span>Oikodespotes</span><strong>{{ chart.oikodespotes.master }}</strong></div>
+      </div>
+
+      <h2>Planetary positions</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Planet</th><th>Position</th><th>House</th><th>Condition</th></tr>
+          </thead>
+          <tbody>
+            {% for planet, position in chart.planets.items() %}
+            <tr>
+              <th>{{ planet }}</th>
+              <td>{{ position.sign }} {{ position.degree }}°{{ " ℞" if position.retrograde else "" }}</td>
+              <td>{{ position.house }}</td>
+              <td>{{ position.dignities | join(", ") if position.dignities else "Peregrine" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <h2>The Greek Lots</h2>
+      <div class="lots-grid">
+        {% for lot, position in chart.lots.items() %}
+        <div><span>{{ lot }}</span><strong>{{ position.sign }} {{ position.degree }}° · House {{ position.house }}</strong></div>
+        {% endfor %}
+      </div>
+
+      {% if personal_readings_enabled and reading_available and birth_input %}
+      <section class="reading-offer">
+        <h2>Ask the Oracle</h2>
+        <p>Claude Sonnet can now interpret these testimonies as a complete Hellenistic reading.</p>
+        <form action="/reading" method="POST">
+          <input type="hidden" name="name" value="{{ birth_input.name }}" />
+          <input type="hidden" name="gender" value="{{ birth_input.gender }}" />
+          <input type="hidden" name="date" value="{{ birth_input.date }}" />
+          <input type="hidden" name="time" value="{{ birth_input.time }}" />
+          <input type="hidden" name="place" value="{{ birth_input.place }}" />
+          <button type="submit">Generate my Claude reading</button>
+        </form>
+        <small>{{ visitor_monthly_limit }} sponsored readings per visitor each month, while the monthly budget lasts.</small>
+      </section>
+      {% elif not personal_readings_enabled %}
+      <p class="interpretation-note">Want to see what Moira's full interpretation looks like? The Augustus demo is a complete pre-generated reading.</p>
+      <a class="inline-action" href="/demo">Read Augustus's nativity</a>
+      {% endif %}
+    </article>
+  </main>
+
+  <footer>
+    <a href="/">← Cast another nativity</a>
+  </footer>
+</body>
+</html>

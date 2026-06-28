@@ -4,7 +4,9 @@
 import anthropic
 from prompts.system_prompt import SYSTEM_PROMPT
 
-client = anthropic.Anthropic()
+
+class ReadingUnavailable(Exception):
+    """Raised when Claude cannot provide a sponsored reading."""
 
 GREEK_NAMES = {
     "Sun":     "Helios",
@@ -91,17 +93,24 @@ def format_chart(data: dict) -> str:
 
 
 def get_reading(chart_data: dict) -> str:
+    # Construct the client only when a live reading is requested. This keeps the
+    # pre-generated demo deployable without an ANTHROPIC_API_KEY.
+    client = anthropic.Anthropic()
+
     user_message = (
         "Please give a reading for the following nativity:\n\n"
         + format_chart(chart_data)
     )
 
-    response = client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=3200,
-        temperature=1,  # slight variation keeps readings natural; use 0 for exact determinism
-        system=SYSTEM_PROMPT,
-        messages=[{"role": "user", "content": user_message}],
-    )
+    try:
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=3200,
+            temperature=1,  # slight variation keeps readings natural; use 0 for exact determinism
+            system=SYSTEM_PROMPT,
+            messages=[{"role": "user", "content": user_message}],
+        )
+    except anthropic.APIError as exc:
+        raise ReadingUnavailable from exc
 
     return response.content[0].text

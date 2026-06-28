@@ -3,14 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Moira — Your Reading</title>
+  <title>Moira — {{ page_title }}</title>
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
   <header>
     <h1>MOIRA</h1>
-    <p class="subtitle">The nativity unfolded</p>
+    <p class="subtitle">{{ subtitle }}</p>
   </header>
+  {% if demo %}
+  <aside class="demo-provenance">
+    <strong>Pre-generated demonstration</strong>
+    <span>No AI request is made when this page opens. The birth is dated to 23 September 63 BCE, just before sunrise in Rome, following Suetonius; ancient dates and birth times remain uncertain.</span>
+  </aside>
+  {% endif %}
   <main class="reading-layout">
     <aside class="chart-container" aria-label="Natal chart">
       {{ chart_svg | safe }}
@@ -20,7 +26,7 @@
     </article>
   </main>
   <footer>
-    <a href="/">← Cast another nativity</a>
+    <a href="/">← {{ "Return to Moira" if demo else "Cast another nativity" }}</a>
   </footer>
 </body>
 </html>
